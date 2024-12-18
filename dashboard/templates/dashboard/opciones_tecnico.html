@@ -1,0 +1,51 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <h1>Bienvenido al menú de Tecnico</h1>
+    <p>Aquí tienes un resumen del sistema:</p>
+
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-header bg-primary text-white">
+                    Tickets Pendientes
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ tickets_pendientes }}</h5>
+                    <p class="card-text">Tickets que requieren atención.</p>
+                    <a href="{% url 'tickets_asignados' %}?status=pendiente" class="btn btn-primary">Ver detalles</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-header bg-success text-white">
+                    Tickets Listos
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ tickets_listos }}</h5>
+                    <p class="card-text">Tickets completados.</p>
+                    <a href="{% url 'tickets_asignados' %}?status=listo" class="btn btn-success">Ver detalles</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-header bg-warning text-dark">
+                    Tickets Totales
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ tickets_totales }}</h5>
+                    <p class="card-text">Total de tickets en el sistema.</p>
+                    <a href="{% url 'tickets_asignados' %}" class="btn btn-warning">Ver todos</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

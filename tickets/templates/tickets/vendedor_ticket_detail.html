@@ -1,0 +1,52 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <h2>Detalles del Ticket</h2>
+    <div class="card">
+        <div class="card-header">
+            <h4>Ticket #{{ ticket.id }}</h4>  <!-- Aquí mostramos el ID del ticket -->
+        </div>
+        <div class="card-body">
+            <h5>Estado Actual: <span class="badge bg-info">{{ ticket.get_estado_display }}</span></h5>  <!-- Estado -->
+            <p><strong>Tipo de Equipo:</strong> {{ ticket.equipo.get_tipo_display }}</p>  <!-- Tipo de equipo -->
+            <p><strong>Marca:</strong> {{ ticket.equipo.get_marca_display }}</p>  <!-- Marca -->
+            <p><strong>Cliente:</strong> {{ ticket.equipo.cliente.nombre }}</p>
+            <p><strong>Cliente rut:</strong> {{ ticket.equipo.cliente.rut }}</p>
+            <p><strong>Fecha de Creación:</strong> {{ ticket.fecha_creacion|date:"d F, Y" }}</p>  <!-- Fecha de creación -->
+            <p><strong>Observaciones del Cliente:</strong> {{ ticket.equipo.observaciones }}</p>  <!-- Observaciones del cliente -->
+            <p><strong>Técnico Asignado:</strong> {{ ticket.tecnico|default:"Aun no asignado" }}</p>  <!-- Técnico asignado -->
+            
+            <h3>Historial de Cambios</h3>
+            <ul>
+                {% for historial in ticket.historial.all %}
+                    <li>
+                        <strong>{{ historial.fecha }}:</strong> {{ historial.descripcion }}
+                        <br>
+                        <small>Realizado por: {{ historial.usuario.username }}</small>
+                    </li>
+                {% endfor %}
+            </ul>
+            
+            <div class="d-flex align-items-center gap-2">
+                {% if ticket.tecnico == None %}
+                    <a href="{% url 'asignar_tecnico' ticket.id %}" class="btn btn-primary">Asignar Técnico</a>
+                {% elif ticket.estado == 'confirmacion' %}
+                    <a href="{% url 'aceptar_precio' pk=ticket.id %}" class="btn btn-warning">Aceptar precio</a>
+                    <a href="{% url 'cancelar_ticket' pk=ticket.id %}" class="btn btn-warning">Cancelar ticket</a>
+                {% elif ticket.estado == 'diagnostico' %}
+                    <form method="post" action="{% url 'marcar_prioridad' ticket.id %}" class="mb-0">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-warning">
+                            {% if ticket.prioridad %} Quitar Prioridad {% else %} Marcar como Prioridad {% endif %}
+                        </button>
+                    </form>
+                {% endif %}
+                <a href="{% url 'consulta_tickets' %}" class="btn btn-secondary">Volver</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock  %}

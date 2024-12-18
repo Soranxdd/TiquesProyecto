@@ -1,0 +1,81 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <h1>Dashboard del Gerente</h1>
+    <p>Aquí tienes una vista general del sistema:</p>
+
+    <div class="row mt-4">
+        <!-- Resumen de tickets -->
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-header bg-primary text-white">
+                    Tickets Pendientes
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ tickets_pendientes }}</h5>
+                    <p class="card-text">Tickets que requieren atención.</p>
+                    <a href="{% url 'gerente_ticket_list' %}?status=pendiente" class="btn btn-primary">Ver detalles</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-header bg-success text-white">
+                    Tickets Listos
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ tickets_listos }}</h5>
+                    <p class="card-text">Tickets completados.</p>
+                    <a href="{% url 'gerente_ticket_list' %}?status=listo" class="btn btn-success">Ver detalles</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-header bg-warning text-dark">
+                    Total de Tickets
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ tickets_totales }}</h5>
+                    <p class="card-text">Cantidad de tickets en el sistema.</p>
+                    <a href="{% url 'gerente_ticket_list' %}" class="btn btn-warning">Ver todos</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <!-- Estadísticas adicionales -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    Técnicos Activos
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ tecnicos_activos }}</h5>
+                    <p class="card-text">Técnicos actualmente trabajando en tickets.</p>
+                    <a href="{% url 'user_list' %}?role=tecnico" class="btn btn-info">Ver técnicos</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    Vendedores Activos
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ vendedores_activos }}</h5>
+                    <p class="card-text">Vendedores que han registrado equipos.</p>
+                    <a href="{% url 'user_list' %}?role=vendedor" class="btn btn-secondary">Ver vendedores</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

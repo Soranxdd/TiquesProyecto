@@ -1,0 +1,40 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <h2 class="mb-4">Editar Usuario</h2>
+    <!-- Mostrar mensajes -->
+    {% if messages %}
+    <div>
+        {% for message in messages %}
+        <div class="alert alert-danger" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="post" class="card p-4">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="username" class="form-label">Nombre de usuario:</label>
+            <input type="text" name="username" value="{{ user.username }}" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Correo electrónico:</label>
+            <input type="email" name="email" value="{{ user.email }}" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="role" class="form-label">Rol:</label>
+            <select name="role" class="form-select">
+                {% for role in roles %}
+                <option value="{{ role }}" {% if user.groups.first.name == role %}selected{% endif %}>{{ role }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Actualizar Usuario</button>
+    </form>
+</div>
+
+{% endblock  %}

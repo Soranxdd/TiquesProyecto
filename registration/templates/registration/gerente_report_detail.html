@@ -1,0 +1,32 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Detalles del Reporte</h2>
+    <p><strong>Usuario:</strong> {{ report.usuario }}</p>
+    <p><strong>Rango de Fechas:</strong> {{ report.fecha_inicio }} - {{ report.fecha_fin }}</p>
+    <p><strong>Generado en:</strong> {{ report.fecha_generacion }}</p>
+
+    {% if rendimiento %}
+        {% with report.usuario.groups.first.name as role %}
+            {% if role == 'Técnicos' %}
+                <h4>Rendimiento Técnico</h4>
+                <ul>
+                    <li><strong>Tickets Resueltos:</strong> {{ rendimiento.tickets_resueltos }}</li>
+                    <li><strong>Tickets Urgentes:</strong> {{ rendimiento.tickets_urgentes }}</li>
+                    <li><strong>Tiempo promedio de reparación:</strong> {{ rendimiento.tiempo_promedio_respuesta }}</li>
+                </ul>
+            {% elif role == 'Vendedores' %}
+                <h4>Rendimiento Vendedor</h4>
+                <ul>
+                    <li><strong>Tickets Creados:</strong> {{ rendimiento.tickets_creados }}</li>
+                    <li><strong>Equipos Registrados:</strong> {{ rendimiento.equipos_registrados }}</li>
+                    <li><strong>Relación de Tickets:</strong> {{ rendimiento.relacion_tickets }}</li>
+                </ul>
+            {% endif %}
+        {% endwith %}
+    {% else %}
+        <p class="text-muted">No hay datos de rendimiento disponibles para este usuario.</p>
+    {% endif %}
+</div>
+{% endblock %}

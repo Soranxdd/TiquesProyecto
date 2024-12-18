@@ -1,0 +1,128 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<script>
+    function bloquearBtn() {
+        document.getElementById("btn-submit").disabled = true;
+    }
+</script>
+
+<div class="container mt-5">
+    <h2>Registrar Nuevo Equipo</h2>
+    <form method="POST" onsubmit="bloquearBtn()">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="mb-3">
+            <label for="id_tipo">Tipo de Equipo</label>
+            {{ form.tipo }}
+            <small class="text-danger">{{ form.tipo.errors }}</small>
+        </div>
+        <div class="mb-3">
+            <label for="id_marca">Marca</label>
+            {{ form.marca }}
+            <small class="text-danger">{{ form.marca.errors }}</small>
+        </div>
+        <div class="mb-3" id="otra-marca-container" style="display: none;">
+            <label for="id_otra_marca">Otra Marca</label>
+            {{ form.otra_marca }}
+            <small class="text-danger">{{ form.otra_marca.errors }}</small>
+        </div>
+        <div class="mb-3">
+            <label for="id_observaciones">Observaciones</label>
+            {{ form.observaciones }}
+            <small class="text-danger">{{ form.observaciones.errors }}</small>
+        </div>
+        <div class="form-check" id="cargador-container" style="display: none;">
+            {{ form.incluye_cargador }}
+            <label for="id_incluye_cargador" class="form-check-label">Incluye Cargador</label>
+            <small class="text-danger">{{ form.incluye_cargador.errors }}</small>
+        </div>
+        <button type="submit" id="btn-submit" class="btn btn-primary">Registrar Equipo</button>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        <!-- Para mostrar el campo cargador si se escoge notebook-->
+        const tipoSelect = document.getElementById('id_tipo');
+        const cargadorContainer = document.getElementById('cargador-container');
+
+        function actualizarCargador() {
+            const tipo = tipoSelect.value.toLowerCase();
+            if (tipo === 'notebook') {
+                cargadorContainer.style.display = 'block';
+            } else {
+                cargadorContainer.style.display = 'none';
+            }
+        }
+
+        // Escuchar el evento de cambio en el select
+        tipoSelect.addEventListener('change', actualizarCargador);
+
+        // Llamar a la función al cargar la página (por si hay un valor preseleccionado)
+        actualizarCargador();
+
+        const marcaSelect = document.getElementById('id_marca');
+        const otraMarcaContainer = document.getElementById('otra-marca-container');
+
+        function actualizarOtraMarca() {
+            if (marcaSelect.value === 'otra') {
+                otraMarcaContainer.style.display = 'block';
+            } else {
+                otraMarcaContainer.style.display = 'none';
+            }
+        }
+
+
+
+        marcaSelect.addEventListener('change', actualizarOtraMarca);
+        actualizarOtraMarca();
+
+        const opcionesMarcas = {
+            notebook: ['hp', 'dell', 'lenovo', 'asus', 'acer', 'msi', 'apple', 'samsung', 'otra'],
+            PC: ['hp', 'dell', 'lenovo', 'asus', 'acer', 'msi', 'apple', 'otra'],
+            impresora: ['hp', 'epson', 'canon', 'brother', 'samsung', 'xerox', 'ricoh', 'otra'],
+        };
+
+        function actualizarMarcas() {
+            const tipoSeleccionado = tipoSelect.value;
+
+            // Limpiar las opciones actuales
+            marcaSelect.innerHTML = '<option value="">Seleccione una marca</option>';
+
+            // Agregar las opciones según el tipo
+            if (tipoSeleccionado in opcionesMarcas) {
+                opcionesMarcas[tipoSeleccionado].forEach(function (marca) {
+                    const option = document.createElement('option');
+                    option.value = marca;
+                    option.textContent = marca.charAt(0).toUpperCase() + marca.slice(1);
+                    marcaSelect.appendChild(option);
+                });
+            }
+        }
+
+        // Evento para actualizar marcas cuando cambie el tipo
+        tipoSelect.addEventListener('change', actualizarMarcas);
+
+        // Inicializar marcas al cargar la página (por si hay un valor preseleccionado)
+        actualizarMarcas();
+    });
+</script>
+<script>
+    document.getElementById("btn-submit").addEventListener("click", function(event) {
+        event.preventDefault(); // Prevenir el envío inmediato del formulario
+        Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Equipo registrado con exito",
+            showConfirmButton: false,
+            timer: 1500
+        }).then(() => {
+            document.getElementById("btn-submit").disabled = true;
+            document.querySelector("form").submit();
+        });
+    });
+</script>
+
+{% endblock  %}

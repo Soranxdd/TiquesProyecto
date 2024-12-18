@@ -1,0 +1,115 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <h2>Consultar Tickets</h2>
+    <form class="mb-3" method="get">  <!-- Cambia a method="get" para que los filtros funcionen -->
+        <div class="row">
+            <div class="col">
+                <label for="filtroFecha" class="form-label">Filtrar por Fecha</label>
+                <input type="date" name="filtroFecha" class="form-control" id="filtroFecha" value="{{ request.GET.filtroFecha }}">
+            </div>
+            <div class="col">
+                <label for="filtroEstado" class="form-label">Filtrar por Estado</label>
+                <select name="filtroEstado" class="form-control" id="filtroEstado">
+                    <option value="">-- Seleccionar --</option>
+                    <option value="pendiente" {% if request.GET.filtroEstado == "pendiente" %}selected{% endif %}>Pendiente</option>
+                    <option value="confirmacion" {% if request.GET.filtroEstado == "confirmacion" %}selected{% endif %}>Esperando confirmacion</option>
+                    <option value="diagnostico" {% if request.GET.filtroEstado == "diagnostico" %}selected{% endif %}>En diagnostico</option>
+                    <option value="listo" {% if request.GET.filtroEstado == "listo" %}selected{% endif %}>Listo para retiro</option>
+                </select>
+            </div>
+            <div class="col">
+                <label for="filtroEquipo" class="form-label">Filtrar por Tipo de Equipo</label>
+                <select name="filtroEquipo" class="form-control" id="filtroEquipo">
+                    <option value="">-- Seleccionar --</option>
+                    <option value="notebook" {% if request.GET.filtroEquipo == "notebook" %}selected{% endif %}>Notebook</option>
+                    <option value="PC" {% if request.GET.filtroEquipo == "PC" %}selected{% endif %}>Pc de escritorio</option>
+                    <option value="impresora" {% if request.GET.filtroEquipo == "impresora" %}selected{% endif %}>Impresora</option>
+                </select>
+                
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Aplicar Filtros</button>
+    </form>
+
+    <table class="table table-bordered table-striped mt-3">
+        <thead class='table-dark'>
+            <tr>
+                <th>Folio</th>
+                <th>Equipo</th>
+                <th>Vendedor</th>
+                <th>Técnico</th>
+                <th>Estado</th>
+                <th>Fecha de Creación</th>
+                <th>Prioridad</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in tickets %}
+            <tr>
+                <td>{{ ticket.equipo.folio }}</td>
+                <td>{{ ticket.equipo }}</td>
+                <td>{{ ticket.vendedor }}</td>
+                <td>{{ ticket.tecnico }}</td>
+                <td>{{ ticket.get_estado_display }}</td>
+                <td>{{ ticket.fecha_creacion|date:"d-m-Y H:i" }}</td>
+                <td>{{ ticket.prioridad|yesno:"Alta,Baja" }}</td>
+                <td><a href="{% url 'detail' ticket.id %}" class="btn btn-primary">Detalles</a></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8">No hay tickets disponibles</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Paginacion -->
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+            <a class="page-link" href="?page=1" aria-label="First">
+                <span aria-hidden="true">&laquo;&laquo;</span>
+            </a>
+            </li>
+            <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+            </li>
+        {% endif %}
+        
+        <!-- Mostrar los números de las páginas -->
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active" aria-current="page">
+                <span class="page-link">{{ num }}</span>
+            </li>
+            {% else %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endif %}
+        {% endfor %}
+        
+        {% if page_obj.has_next %}
+            <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+            </li>
+            <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                <span aria-hidden="true">&raquo;&raquo;</span>
+            </a>
+            </li>
+        {% endif %}
+        </ul>
+    </nav>
+</div>
+
+{% endblock %}

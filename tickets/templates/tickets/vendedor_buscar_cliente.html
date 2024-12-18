@@ -1,0 +1,21 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<script>
+    function bloquearBtn() {
+        document.getElementById("btn-submit").disabled = true; // Bloquear botón
+    }
+</script>
+
+<div class="container mt-5">
+    <h2>Buscar cliente</h2>
+    <p>En caso de no encontrarlo se debera registrar</p>
+    <form method="POST" onsubmit="bloquearBtn()">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" id="btn-submit" class="btn btn-primary">Buscar</button>
+    </form>
+</div>
+
+{% endblock %}

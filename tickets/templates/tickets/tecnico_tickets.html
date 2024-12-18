@@ -1,0 +1,90 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <h2 class='mb-4'>Tickets Asignados</h2>
+    <div class="d-flex justify-content-around mb-4" role="group" aria-label="Filtrar por estado">
+        <a href="?estado=pendiente&fecha={{ request.GET.fecha }}&prioridad={{ request.GET.prioridad }}" class="btn btn-primary {% if estado_actual == 'pendiente' %}active{% endif %}">
+            Pendiente
+        </a>
+        <a href="?estado=diagnostico&fecha={{ request.GET.fecha }}&prioridad={{ request.GET.prioridad }}" class="btn btn-primary {% if estado_actual == 'diagnostico' %}active{% endif %}">
+            En Diagnóstico
+        </a>
+        <a href="?estado=reparacion&fecha={{ request.GET.fecha }}&prioridad={{ request.GET.prioridad }}" class="btn btn-secondary {% if estado_actual == 'reparacion' %}active{% endif %}">
+            En Reparación
+        </a>
+        <a href="?estado=listo&fecha={{ request.GET.fecha }}&prioridad={{ request.GET.prioridad }}" class="btn btn-success {% if estado_actual == 'listo' %}active{% endif %}">
+            Listo para Retiro
+        </a>
+    </div>
+    <form method="get" class="mb-3">
+        <div class="row g-2">
+            <!-- Filtro por estado (oculto) -->
+            <input type="hidden" name="estado" value="{{ estado_actual }}">
+            <!-- Filtro por fecha -->
+            <div class="col-md-4">
+                <label for="fecha" class="form-label">Fecha</label>
+                <input type="date" name="fecha" id="fecha" class="form-control" value="{{ request.GET.fecha }}">
+            </div>
+            <div class="col-md-4">
+                <label for="prioridad" class="form-label">Prioridad</label>
+                <select name="prioridad" id="prioridad" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="1" {% if request.GET.prioridad == '1' %}selected{% endif %}>Con prioridad</option>
+                    <option value="0" {% if request.GET.prioridad == '0' %}selected{% endif %}>Sin prioridad</option>
+                </select>
+            </div>
+            <!-- Botón para aplicar filtros -->
+            <div class="col-md-3 align-self-end">
+                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+            </div>
+        </div>
+    </form>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Equipo</th>
+                <th>Estado</th>
+                <th>Prioridad</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in tickets %}
+            <tr>
+                <td>{{ ticket.id }}</td>
+                <td>{{ ticket.equipo }}</td>
+                <td>{{ ticket.get_estado_display }}</td>
+                <td>{{ ticket.prioridad|yesno:"Alta,Baja" }}</td>
+                <td>
+                    <a href="{% url 'tecnico_detail' ticket.id %}" class="btn btn-primary">Ver detalles</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Paginación -->
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; Primero</a>
+                <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+            {% endif %}
+    
+            <span class="current">
+                Pagina {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+            </span>
+    
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">Ultimo &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+</div>
+
+{% endblock  %}

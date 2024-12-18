@@ -1,0 +1,29 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Id reporte</th>
+                <th>Fecha de Inicio</th>
+                <th>Fecha de Fin</th>
+                <th>Generado el</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ report.id }}</td>
+                <td>{{ report.fecha_inicio }}</td>
+                <td>{{ report.fecha_fin }}</td>
+                <td>{{ report.fecha_generacion|date:"d-m-Y H:i" }}</td>
+                <td>
+                    <a href="{% url 'descargar_reporte' report.id %}" class="btn btn-success btn-sm">Descargar</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+{% endblock  %}

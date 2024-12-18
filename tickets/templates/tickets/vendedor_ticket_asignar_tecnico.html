@@ -1,0 +1,23 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <h2>Asignar Tecnico</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        <label for="tecnico">Selecciona un técnico:</label>
+        <!-- Al enviar el formulario, enviamos el valor tecnico.id a la vista mediante el nombre tecnico_id,
+        para asignarle el tecnico al ticket -->
+        <select name="tecnico_id" id="tecnico" required>
+            {% for tecnico in tecnicos %}
+                <option value="{{ tecnico.id }}">{{ tecnico.username }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary">Asignar Técnico</button>
+    </form>
+
+    <a href="{% url 'detail' ticket.id %}" class='btn btn-primary'>Volver</a>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <h2>Detalles del Ticket</h2>
+    <div class="card">
+        <div class="card-header">
+            <h4>Ticket #{{ ticket.id }}</h4>  <!-- Aquí mostramos el ID del ticket -->
+        </div>
+        <div class="card-body">
+            <h5>Estado Actual: <span class="badge bg-info">{{ ticket.get_estado_display }}</span></h5>  <!-- Estado -->
+            <p><strong>Tipo de Equipo:</strong> {{ ticket.equipo.get_tipo_display }}</p>  <!-- Tipo de equipo -->
+            <p><strong>Marca:</strong> {{ ticket.equipo.get_marca_display }}</p>  <!-- Marca -->
+            <p><strong>Cliente:</strong> {{ ticket.equipo.cliente.nombre }}</p>
+            <p><strong>Cliente rut:</strong> {{ ticket.equipo.cliente.rut }}</p>
+            <p><strong>Fecha de Creación:</strong> {{ ticket.fecha_creacion|date:"d F, Y" }}</p>  <!-- Fecha de creación -->
+            <p><strong>Observaciones del Cliente:</strong> {{ ticket.equipo.observaciones }}</p>  <!-- Observaciones del cliente -->
+            <p><strong>Técnico Asignado:</strong> {{ ticket.tecnico }}</p>  <!-- Técnico asignado -->
+            
+            <h3>Historial de Cambios</h3>
+            <ul>
+                {% for historial in ticket.historial.all %}
+                    <li>
+                        <strong>{{ historial.fecha }}:</strong> {{ historial.descripcion }}
+                        <br>
+                        <small>Realizado por: {{ historial.usuario.username }}</small>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <div class="d-flex align-items-center gap-2">
+                {% if ticket.estado == 'pendiente' %}
+                    <a href="{% url "costo" ticket.id %}" class="btn btn-success">Asignar costo</a>
+                {% elif ticket.estado == 'diagnostico' %}
+                <form method="post" action="{% url 'aceptar_ticket' ticket.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="my-2 btn btn-warning">Aceptar Ticket</button>
+                </form>
+                {% elif ticket.estado == 'reparacion' %}
+                    <a href="{% url "marcar_listo" ticket.id %}" class="btn btn-success">Marcar como Listo</a>
+                    <a href="{% url "registrar_avance" ticket.id %}" class="btn btn-success">Registrar avance</a>
+                {% endif %}
+                <a href="{% url 'tickets_asignados' %}" class="btn btn-secondary">Volver</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

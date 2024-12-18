@@ -1,0 +1,61 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Registrar Avance</h2>
+    <p>Ticket ID: {{ ticket.id }}</p>
+    <form method="post" id="form-avance">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="descripcion"><strong>Descripción del avance:</strong></label>
+            {{ form.descripcion }}
+        </div>
+        <button type="submit" id="btn-submit" class="btn btn-primary">Guardar Avance</button>
+        <a href="{% url 'tecnico_detail' ticket.id %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+
+<script>
+    // Capturar el evento submit del formulario
+    document.getElementById("form-avance").addEventListener("submit", function (event) {
+        // Prevenir el envío del formulario inicial
+        event.preventDefault();
+
+        // Verificar si hay errores de validación en el formulario
+        const descripcion = document.querySelector("#id_descripcion").value.trim();
+
+        let errores = [];
+
+        if (!descripcion) {
+            errores.push("El campo 'Descripción del avance' no puede estar vacío.");
+        } else if (descripcion.length < 6) {
+            errores.push("La descripción debe tener al menos 6 caracteres.");
+        }
+
+        if (errores.length > 0) {
+            // Mostrar errores con SweetAlert
+            Swal.fire({
+                icon: "error",
+                title: "Errores en el formulario",
+                html: `<ul style="list-style-type: none;
+                                  padding: 0;
+                                  margin: 0;">
+                            ${errores.map(err => `<li>${err}</li>`).join("")}
+                        </ul>`,
+            });
+        } else {
+            // Si no hay errores, mostrar la alerta de éxito y enviar el formulario
+            Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "Avance ingresado correctamente.",
+                showConfirmButton: false,
+                timer: 1500,
+            }).then(() => {
+                // Enviar el formulario después de la alerta de éxito
+                document.getElementById("form-avance").submit();
+            });
+        }
+    });
+</script>
+{% endblock %}

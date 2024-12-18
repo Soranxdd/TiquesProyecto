@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Boostrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" 
+        rel="stylesheet" 
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" 
+        crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" 
+        integrity="sha384-u10knCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZ1HgTPOOmMi466C8" 
+        crossorigin="anonymous"></script>
+    <!-- Boostrap icons -->
+     <link rel="stylesheet" 
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+    <script src="
+    https://cdn.jsdelivr.net/npm/sweetalert2@11.15.0/dist/sweetalert2.all.min.js
+    "></script>
+    <title>Home</title>
+    <style>
+        body {
+            background-color: #eaeaed; /* Fondo gris claro */
+        }
+        
+        .container {
+            background-color: #f8edeb;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        table {
+
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"><i class="fas fa-ticket-alt"></i> Sistema de Tickets</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url "dashboard" %}"><i class="fas fa-home"></i> Inicio</a>
+                    </li>
+                    {% if request.user.groups.all.0.name == 'Vendedores' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'buscar_cliente' %}"><i class="fas fa-list"></i> Registrar equipo</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'consulta_tickets' %}"><i class="fas fa-list"></i> Consultar Tickets</a>
+                        </li>
+                    {% elif request.user.groups.all.0.name == 'Técnicos' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url "tickets_asignados" %}">Tickets Asignados</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url "buscar_folio" %}">Historial</a>
+                        </li>
+                    {% elif request.user.groups.all.0.name == 'Gerente' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url "user_list" %}">Gestion de Usuarios</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url "gerente_ticket_list" %}"><i class="fas fa-cogs"></i> Gestión de Tickets</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url "reports_list" %}">Reportes</a>
+                        </li>
+                    {% endif %}
+                </ul>
+                {% if user.is_authenticated %}
+                <div class="d-flex">
+                    <a class="btn btn-outline-light" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    
+    {% block content %}
+
+    {% endblock %}
+
+    <script>
+        const tiempoInactividadMaxima = 120 * 1000; // 2 minuto
+        let tiempoUltimaActividad = Date.now();
+        let intervaloVerificacion;
+        let alertaMostrada = false;  // Bandera para evitar mostrar múltiples alertas
+
+        function registrarActividad() {
+            tiempoUltimaActividad = Date.now();
+            alertaMostrada = false;  // Reiniciar la bandera si el usuario está activo
+        }
+
+        function verificarInactividad() {
+            if (Date.now() - tiempoUltimaActividad > tiempoInactividadMaxima && !alertaMostrada) {
+                alertaMostrada = true;  // Marcar que la alerta ha sido mostrada
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Tu sesión ha expirado por inactividad. Serás redirigido al login.",
+                }).then(() => {
+                    // Redirigir al login después de que el usuario cierre la alerta
+                    window.location.href = "{% url 'logout_time' %}";
+                });
+            }
+        }
+    
+        // Escucha eventos para registrar actividad del usuario
+        document.addEventListener("mousemove", registrarActividad);
+        document.addEventListener("keydown", registrarActividad);
+        document.addEventListener("click", registrarActividad);
+    
+        // Verifica la inactividad cada 10 segundos
+        setInterval(verificarInactividad, 10000);
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

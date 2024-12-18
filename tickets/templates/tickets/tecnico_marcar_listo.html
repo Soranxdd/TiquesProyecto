@@ -1,0 +1,75 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Marcar como Listo</h2>
+    <p><strong>Ticket ID:</strong> {{ ticket.id }}</p>
+    <p><strong>Estado actual:</strong> {{ ticket.get_estado_display }}</p>
+    <form method="post" id="form-listo">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="descripcion_reparacion"><strong>Descripcion reparacion:</strong></label>
+            {{ form.descripcion_reparacion }}
+        </div>
+        <div class="mb-3">
+            <label for="costo"><strong>Costo:</strong></label>
+            {{ form.costo }}
+        </div>
+        <button type="submit" id="btn-submit" class="btn btn-success">Guardar y Marcar como Listo</button>
+        <a href="{% url 'tickets_asignados' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+
+<script>
+    // Capturar el evento submit del formulario
+    document.getElementById("form-listo").addEventListener("submit", function (event) {
+        // Prevenir el envío del formulario inicial
+        event.preventDefault();
+
+        // Verificar si hay errores de validación en el formulario
+        const descripcionReparacion = document.querySelector("#id_descripcion_reparacion").value.trim();
+        const costo = document.querySelector("#id_costo").value.trim();
+
+        let errores = [];
+
+        if (!descripcionReparacion) {
+            errores.push("El campo 'Descripción reparación' no puede estar vacío.");
+        } else if (descripcionReparacion.length < 6) {
+            errores.push("La descripción debe tener al menos 6 caracteres.");
+        }
+
+        if (!costo) {
+            errores.push("El campo 'Costo' no puede estar vacío.");
+        } else if (parseFloat(costo) <= 0) {
+            errores.push("El costo debe ser mayor a 0.");
+        } else if (parseFloat(costo) > 1000000000) {
+            errores.push("El costo no puede superar los 1.000.000.000 CLP.");
+        }
+
+        if (errores.length > 0) {
+            // Mostrar errores con SweetAlert
+            Swal.fire({
+                icon: "error",
+                title: "Errores en el formulario",
+                html: `<ul style="list-style-type: none;
+                                  padding: 0;
+                                  margin: 0;">
+                            ${errores.map(err => `<li>${err}</li>`).join("")}
+                        </ul>`,
+            });
+        } else {
+            // Si no hay errores, mostrar la alerta de éxito y enviar el formulario
+            Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "Costo asignado correctamente.",
+                showConfirmButton: false,
+                timer: 1500,
+            }).then(() => {
+                // Enviar el formulario después de la alerta de éxito
+                document.getElementById("form-listo").submit();
+            });
+        }
+    });
+</script>
+{% endblock %}
